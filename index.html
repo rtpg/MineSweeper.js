@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+		<html>
+<head>
+	<meta charset=utf-8>
+	<title>Minesweeper</title>
+</head>
+<script src="jquery-1.7.1.js"></script>
+<script src="Minesweeper.js"></script>
+<body>
+	<script>
+	$(document).ready(function(){
+		console.log('ready');
+		var g=new Grid(5,5);
+		$('body').append(g.HTMLelt);
+	});
+	</script>
+</body>
+</html>
