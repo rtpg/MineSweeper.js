@@ -6,12 +6,24 @@
 </head>
 <script src="jquery-1.7.1.js"></script>
 <script src="Minesweeper.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
 <body>
 	<script>
 	$(document).ready(function(){
 		console.log('ready');
-		var g=new Grid(5,5);
-		$('body').append(g.HTMLelt);
+		u=new UI(20,20);
+		u.install('body');
+		u.init(50);
+
+		/* was used to debug the neighborsOf code
+		g.nodes.map(
+			function(list){
+				list.map(
+					function(node){
+						node.setNum(node.id);
+					});
+			});
+			*/
 	});
 	</script>
 </body>

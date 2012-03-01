@@ -25,7 +25,8 @@ var Grid=function(numRows,numColumns){
 	//store the dimensions of the grid
 	this.dim={rows:numRows,cols:numColumns};
 	//generate the html elements
-	this.HTMLelt=$('<table></table>');
+	this.HTMLelt=$('<table></table>')
+		.addClass('grid');
 	//at the same time, generate the internal table to store the mines
 	this.nodes=[];
 	var row=$('<tr></tr>');
@@ -35,8 +36,11 @@ var Grid=function(numRows,numColumns){
 		var curRow=row.clone();
 		var curNodes=[];
 		for(var j=0;j<numRows;j++){
-			var curCell=$('<td>?</td>')
+			var curCell=$('<td></td>')
 							.addClass('node');
+			var cellText=$('<span>?</span>')
+							.addClass('hidden');
+			curCell.append(cellText);
 			curCell.data('id',j+i*numRows);
 			curNodes.push(new Node(curCell,j+i*numRows));
 			curRow.append(curCell);
@@ -130,16 +134,18 @@ Grid.prototype.neighborsOf=function(id){
 
 Grid.prototype.click=function(id){
 	var mine=this.getNode(id);
+	if(mine.flagged){//if there's a flag, left click disabled
+		return;
+	}
 	if(mine.mine){
 		//GAME OVER MAN!
 		console.log("game over");
 		return "game over";
 	}
 	mine.setChecked(true);
-	mine.setNum(mine.num);
+	mine.dElt.children().removeClass('hidden');
 	if(mine.num==0){// if there are no mines around, we click again
 		//it's that effect from minesweeper of revealing many tiles at once
-		console.log('mine.val=0');
 		var neighbors=this.neighborsOf(mine.id);
 		for(var i=0;i<neighbors.length;i++){
 			if(!neighbors[i].checked){
@@ -150,7 +156,15 @@ Grid.prototype.click=function(id){
 	return "good";
 }
 
-
+/**
+  function to deal with rightclicks**/
+Grid.prototype.rightclick=function(id){
+	var node=this.getNode(id);
+	if(node.checked){//if it's clicked we don't need to flag it
+		return;
+	}
+	node.setFlagged(!node.flagged);//we're toggling the flag!
+}
 Grid.prototype.init=function(n){
 	this.setMines(n);
 	//setting up the values of the nodes
@@ -176,6 +190,7 @@ var Node=function(dElt,id,mine){
 	this.dElt=dElt;
 	this.id=id;
 	this.checked=false;
+	this.flagged=false;
 	this.mine=(mine===undefined?false:mine);
 	this.num=0;//to be set later
 }
@@ -190,18 +205,16 @@ Node.prototype.setChecked=function(val){
 	if(val===true){
 		this.dElt.addClass('checked');	
 	}else{
-		this.dElt.removeClass('ckecked');
+		this.dElt.removeClass('checked');
 	}
 }
 
 Node.prototype.setNum=function(val){
 	//see above
-	if(this.checked){
-		if(val==0){
-			this.dElt.html(' ');
-		}else{
-			this.dElt.html(val);
-		}
+	if(val==0){
+		this.dElt.children().html(' ');
+	}else{
+		this.dElt.children().html(val);
 	}
 	this.num=val;
 }
@@ -219,6 +232,20 @@ Node.prototype.setMined=function(val){
 	}
 }
 
+Node.prototype.setFlagged=function(val){
+	if(val===this.flagged){
+		return;
+	}
+	this.flagged=val;
+	if(val===true){
+		this.dElt.children().removeClass('hidden').html('F');
+	}
+	else{
+		this.dElt.children().addClass('hidden');
+		this.setNum(this.num);
+	}
+}
+
 var UI=function(numRows,numColumns){
 	this.grid=new Grid(numRows,numColumns);
 	var that=this;
@@ -231,7 +258,14 @@ var UI=function(numRows,numColumns){
 			//now I can run the game logic
 			var rV=that.grid.click(id);
 			console.log('ran with id '+id);
-		})
+		});
+	this.grid.HTMLelt.on('contextmenu','.node',
+		function(evt){
+			console.log('right click');
+			var id=$(this).data('id');
+			that.grid.rightclick(id);
+			evt.preventDefault();
+		});
 }
 
 UI.prototype.init=function(n){
