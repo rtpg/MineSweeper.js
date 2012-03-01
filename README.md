@@ -39,11 +39,11 @@ All of these parts are pretty interdependent however:
 
 - The Interface needs:
 
-	-From the Grid:
+	- From the Grid:
 
 		An HTML element representing the grid
 
-	-From the Game Logic:
+	- From the Game Logic:
 
 		A way to get the number of mines left and the current state of the game
 
