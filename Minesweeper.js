@@ -133,14 +133,15 @@ Grid.prototype.neighborsOf=function(id){
 
 
 Grid.prototype.click=function(id){
+	var rV=1;
 	var mine=this.getNode(id);
 	if(mine.flagged){//if there's a flag, left click disabled
-		return;
+		return 0;
 	}
 	if(mine.mine){
 		//GAME OVER MAN!
 		console.log("game over");
-		return "game over";
+		return -1;
 	}
 	mine.setChecked(true);
 	mine.dElt.children().removeClass('hidden');
@@ -149,11 +150,11 @@ Grid.prototype.click=function(id){
 		var neighbors=this.neighborsOf(mine.id);
 		for(var i=0;i<neighbors.length;i++){
 			if(!neighbors[i].checked){
-				this.click(neighbors[i].id);
+				rV+=this.click(neighbors[i].id);
 			}
 		}
 	}
-	return "good";
+	return rV;
 }
 
 /**
@@ -161,10 +162,16 @@ Grid.prototype.click=function(id){
 Grid.prototype.rightclick=function(id){
 	var node=this.getNode(id);
 	if(node.checked){//if it's clicked we don't need to flag it
-		return;
+		return 0;
 	}
 	node.setFlagged(!node.flagged);//we're toggling the flag!
+	if(node.flagged){
+		return 1;
+	}else{
+		return -1;
+	}
 }
+
 Grid.prototype.init=function(n){
 	this.setMines(n);
 	//setting up the values of the nodes
@@ -236,6 +243,7 @@ Node.prototype.setFlagged=function(val){
 	if(val===this.flagged){
 		return;
 	}
+	//something to note: we have to unhide the inner span in order to 
 	this.flagged=val;
 	if(val===true){
 		this.dElt.children().removeClass('hidden').html('F');
@@ -247,7 +255,15 @@ Node.prototype.setFlagged=function(val){
 }
 
 var UI=function(numRows,numColumns){
-	this.grid=new Grid(numRows,numColumns);
+	this.scoreHolder=$('<div></div>')
+						.html('left:XX/XX')
+						.addClass('score');
+	this.numSquares=numRows*numColumns;
+	this.numRows=numRows;
+	this.numColumns=numColumns;}
+
+UI.prototype.init=function(n){	
+	this.grid=new Grid(this.numRows,this.numColumns);
 	var that=this;
 	this.grid.HTMLelt.on('click','.node',
 		function(evt){
@@ -257,21 +273,70 @@ var UI=function(numRows,numColumns){
 			var id=$this.data('id');
 			//now I can run the game logic
 			var rV=that.grid.click(id);
-			console.log('ran with id '+id);
+			if (rV==-1){
+				that.gameOver();
+			}
+			else{
+				that.numSquares-=rV;
+				if(that.numMines==that.numSquares){
+					that.won();
+				}
+			}
 		});
 	this.grid.HTMLelt.on('contextmenu','.node',
 		function(evt){
 			console.log('right click');
 			var id=$(this).data('id');
-			that.grid.rightclick(id);
+			var rV=that.grid.rightclick(id);
+			that.minesLeft-=rV;
+			that.updateScore();
 			evt.preventDefault();
 		});
-}
 
-UI.prototype.init=function(n){
+	this.numMines=n;
+	this.minesLeft=n;
+	this.scoreHolder.html('left:'+n+'/'+n);
 	this.grid.init(n);
 }
 
+UI.prototype.updateScore=function(){
+	this.scoreHolder.html('left:'+
+			this.minesLeft + '/'+
+			this.numMines);
+}
+
 UI.prototype.install=function(selector){
-	$(selector).append(this.grid.HTMLelt);
+	if(selector!==undefined){//first init
+		this.$selector=$(selector);
+	}else{//subsequent inits
+		this.$selector.empty();
+		this.init(this.numMines);
+	}
+	this.$selector.append(this.scoreHolder)
+			.append(this.grid.HTMLelt);
+}
+
+UI.prototype.gameOver=function(){
+	var that=this;
+	this.$selector.empty();
+	var $h1=$('<h1>Game Over!</h1>').addClass('center');
+	$('<button> Try again </button>')
+		.on('click',function(){
+			that.install();
+		})
+		.appendTo($h1);
+	$h1.appendTo(this.$selector);
+}
+
+//this is p much the same things as gameOver
+UI.prototype.won=function(){
+	var that=this;
+	this.$selector.empty();
+	var $h1=$('<h1>You won!</h1>').addClass('center');
+	$('<button> Try again </button>')
+		.on('click',function(){
+			that.install();
+		})
+		.appendTo($h1);
+	$h1.appendTo(this.$selector);
 }

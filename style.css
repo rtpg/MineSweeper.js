@@ -1,6 +1,10 @@
+/**
+ minesweeper css 
+ **/
+
 .grid{
 	margin:auto;
-	margin-top:3em;
+	margin-top:2em;
 	font-family:sans-serif;
 }
 
@@ -17,3 +21,19 @@
 .hidden{
 	visibility:hidden;
 }
+
+.score{
+	font-size:x-large;
+	text-align:center;
+}
+
+.center{
+	width:100%;
+	display:inline-block;
+
+	text-align:center;
+}
+
+/**
+  end minesweeper css
+  **/

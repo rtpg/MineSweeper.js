@@ -96,11 +96,14 @@ the Grid has:
 
 - click(id)
 
-	runs the click event on the node with that id
+	runs the click event on the node with that id.
+	Returns the number of elements "actually" clicked
+	(-1 if gameOver)
 
 - rightclick(id)
 
 	Same as above, except for right click
+	returns 1 if flagged, -1 if unflagged.
 
 - init(n)
 
@@ -149,6 +152,26 @@ the Node has:
 
 the UI has:
 
+- scoreHolder
+
+	The jQuery elt to show the score
+
+- grid
+
+	the Game grid
+
+- numMines
+
+	the number of mines  initially set up
+
+- minesLeft
+
+	the number of mines (supposedly) left
+
+- numSquares
+
+	the number of squares left to click
+	
 - init(n)
 
 	Initialises the entire system ( n is the number of mines )
