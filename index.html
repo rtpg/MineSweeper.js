@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+		<html>
+<head>
+	<meta charset=utf-8>
+	<title>Minesweeper</title>
+</head>
+<script src="jquery-1.7.1.js"></script>
+<script src="Minesweeper.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<body>
+	<script>
+	$(document).ready(function(){
+		console.log('ready');
+		u=new UI(20,20);
+		u.init(50);
+		u.install('body');
+
+
+		/* was used to debug the neighborsOf code
+		g.nodes.map(
+			function(list){
+				list.map(
+					function(node){
+						node.setNum(node.id);
+					});
+			});
+			*/
+	});
+	</script>
+</body>
+</html>

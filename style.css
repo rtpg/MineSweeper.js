@@ -1,0 +1,39 @@
+/**
+ minesweeper css 
+ **/
+
+.grid{
+	margin:auto;
+	margin-top:2em;
+	font-family:sans-serif;
+}
+
+.node{
+	border: 0.3em outset;
+	width:2em;
+	height:2em;
+	text-align:center;
+}
+.checked{
+	border-style:inset;
+	background-color:lightgrey;
+}
+.hidden{
+	visibility:hidden;
+}
+
+.score{
+	font-size:x-large;
+	text-align:center;
+}
+
+.center{
+	width:100%;
+	display:inline-block;
+
+	text-align:center;
+}
+
+/**
+  end minesweeper css
+  **/
